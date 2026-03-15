@@ -270,16 +270,24 @@ This script performs the following actions:
 User creation and group membership can be verified using PowerShell.
 ```Get-ADGroupMember IT_Admins```
 
+![Image](images/ad-18.png)
+
+*Figure 17: Verification of the IT_Admins security group membership in Active Directory, showing domain users assigned to the group through both manual and automated provisioning.*
+
+
 ![Image](images/ad-19.png)
 
-
-![Image](images/ad-20.png)
+*Figure 18: Verifying Active Directory group membership using PowerShell with Get-ADGroupMember IT_Admins, displaying users assigned to the IT_Admins security group.*
 
 ### Enforcing Domain Password and Account Lockout Policies with Group Policy
 -------------
 Group Policy allows administrators to centrally enforce security settings across an Active Directory domain. Instead of configuring authentication rules on individual machines, policies are defined once in a Group Policy Object (GPO) and applied domain-wide.
 
 In this lab, the Default Domain Policy was modified to enforce password complexity requirements and account lockout protections, helping mitigate brute force and password spraying attacks.
+
+![Image](images/ad-21.png)
+
+*Figure 18: Navigating to Password Policy and Account Lockout Policy within the Default Domain Policy using the Group Policy Management Editor.*
 
 ### Configuring Password Policy
 -------------------
@@ -301,8 +309,9 @@ Group Policy Management
 → Password Policy / Account Lockout
 ```
 
-ad-21, ad-22, ad-24
+![Image](images/ad-22.png)
 
+*Figure 19: Password policy settings configured to enforce minimum password length, password history, and complexity requirements across the Active Directory domain.*
 
 ### Applying the Policy
 ------------
@@ -311,39 +320,48 @@ After modifying the policy, the updated Group Policy configuration was applied i
 Command used:
 `gpupdate /force`
 
-This command forces the system to refresh both computer and user policies without waiting for the standard background refresh interval.
+This command forces the system to refresh both computer and user policies.
 
-### Verifying Policy Enforcement
-------------
+![Image](images/ad-23.png)
+
+*Figure 20: Applying updated Group Policy settings with gpupdate /force and verifying domain password and lockout policies using the net accounts command in PowerShell.*
+
+![Image](images/ad-24.png)
+
+*Figure 21: Configuring Account Lockout Policy in the Default Domain Policy to lock accounts after 5 failed login attempts and automatically reset the lockout counter after 30 minutes.*
+
+**Verifying Policy Enforcement**
 Policy enforcement can be verified from the domain controller using the following command:
 
 `net accounts`
 
-ad-23
+This command displays the currently enforced domain authentication settings, including password length requirements, password history, and account lockout thresholds. Successful verification confirms that the Group Policy configuration is being enforced across the domain environment.
 
-This command displays the currently enforced domain authentication settings, including password length requirements, password history, and account lockout thresholds.
-
-Successful verification confirms that the Group Policy configuration is being enforced across the domain environment.
-
-Implementing Role-Based Access Control (RBAC) with Shared Resources
+### Implementing Role-Based Access Control (RBAC) with Shared Resources
+--------------------
 To demonstrate how Active Directory groups control access to resources, departmental shared folders were created and permissions were assigned to the corresponding security groups. Rather than granting access to individual users, permissions were applied to groups, allowing users to inherit access through group membership. This follows the Role-Based Access Control (RBAC) model commonly used in enterprise environments.
 
 In this lab, three departmental shares were created and mapped to their respective Active Directory security groups.
 
 Example mapping:
+```
 Finance_Share  → Finance_Team
 IT_Share       → IT_Admins
 HelpDesk_Share → HelpDesk
-
-AD-25
+```
 
 This ensures that only members of each group can access their designated resources.
+
+![Image](images/ad-25.png)
+
+*Figure 22: Departmental shared folders (Finance_Share, HelpDesk_Share, and IT_Share) created on the server to demonstrate role-based access control (RBAC) using Active Directory security groups.*
 
 
 ### Assigning NTFS Permissions
 ---------------
 Permissions were configured so that each department group has access only to its corresponding folder.
 Steps:
+```
 - Navigate to the folder location: C:\Shares
 - Right-click the folder (example: Finance_Share) and select: Properties
 - Go to the Security tab.
@@ -353,15 +371,20 @@ Steps:
 - Click: Check Names → OK
 - Assign the appropriate permissions (example: Modify or Read/Write).
 - Click Apply → OK.
+```
 
-AD-26
+![Image](images/ad-26.png)
+
+*Figure 23: Assigning NTFS permissions to the Finance_Team Active Directory security group for the Finance_Share folder to enforce role-based access control.*
 
 This process was repeated for all three departmental folders using their corresponding security groups.
 
 ### Configuring Network Sharing
 ----------------
 To allow users to access these folders over the network, each directory was configured as a shared resource.
+
 Steps:
+```
 Right-click the folder and select: Properties
 Open the Sharing tab.
 Click: Advanced Sharing
@@ -370,7 +393,14 @@ Click: Permissions
 Add the corresponding Active Directory group (example: IT_Admins).
 Assign appropriate share permissions (example: Read or Change).
 Click Apply → OK.
+```
 
-AD-27
+![Image](images/ad-27.png)
+
+*Figure 24: Configuring network share permissions for IT_Share and granting access to the IT_Admins Active Directory security group through Advanced Sharing settings.*
 
 Although the screenshots demonstrate the configuration for one group, the same process was applied to all three departmental shares.
+
+
+### Conclusion
+-------------
